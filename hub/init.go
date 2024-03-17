@@ -83,7 +83,11 @@ func initMods() {
 	// gin.SetMode(util.IF(conf.C.Debug, gin.DebugMode, gin.ReleaseMode).(string))
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
-	engine.Use(middleware.Recovery(), middleware.RequestLog(), middleware.Sentry())
+	engine.Use(middleware.Recovery(), middleware.RequestLog())
+	// enable sentry in prod
+	if !conf.C.Debug {
+		engine.Use(middleware.Sentry())
+	}
 
 	// register custom validator
 	validatorx.MustRegister("xss", validatorx.NewXSSFunc())
@@ -119,5 +123,5 @@ func initMods() {
 		scopes[info.ID.String()] = scope
 	}
 
-	hub.Log.Info("init router and mods succ...")
+	hub.Log.Info("init router and mods successfully...")
 }
