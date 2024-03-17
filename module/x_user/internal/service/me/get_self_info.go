@@ -3,7 +3,6 @@ package me
 import (
 	"github.com/daidr/doulog-core/lib/daos"
 	"github.com/daidr/doulog-core/lib/models"
-	"github.com/daidr/doulog-core/lib/utils"
 	"github.com/daidr/doulog-core/module/x_user/internal/model"
 )
 
@@ -25,13 +24,11 @@ func GetSelfInfo(db *models.DB, uid uint64) (*model.GetSelfInfoResp, error) {
 		return nil, err
 	}
 
-	emailHash := utils.GetMD5(u.Email)
-
 	return &model.GetSelfInfoResp{
 		Id:        u.Id,
 		Name:      u.Name,
 		Email:     u.Email,
-		EmailHash: emailHash,
+		EmailHash: u.EmailHash,
 		IsAdmin:   u.IsAdmin,
 		IsBanned:  u.IsBanned,
 	}, nil

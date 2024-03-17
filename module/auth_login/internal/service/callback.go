@@ -63,14 +63,23 @@ func Callback(db *models.DB, state string, code string) (string, string, error) 
 			name = open.Login
 		}
 		u := models.TUser{
-			Name:     name,
-			Email:    open.Email,
-			Homepage: open.Homepage,
-			IsAdmin:  false,
-			Attr:     0,
+			Name:      name,
+			Email:     open.Email,
+			EmailHash: utils.GetMD5(open.Email),
+			Homepage:  open.Homepage,
+			IsAdmin:   false,
+			Attr:      0,
 		}
 		if err := tx.Create(&u).Error; err != nil {
 			return err
+		}
+
+		// 如果 id 为 1 则设置为管理员
+		if u.Id == 1 {
+			u.IsAdmin = true
+			if err := tx.Save(&u).Error; err != nil {
+				return err
+			}
 		}
 
 		// 新建oauth绑定关系

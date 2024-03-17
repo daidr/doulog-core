@@ -12,7 +12,7 @@ import (
 // ChangeNickName 修改昵称
 func ChangeNickName(c *gin.Context) {
 	req := struct {
-		NewName string `json:"new_name" form:"new_name" binding:"required,min=1,max=15,sensitive,xss"` // 限制名字长度(UTF8字符长度)
+		NewName string `json:"new_name" form:"new_name" binding:"required,min=1,max=25,sensitive,xss"` // 限制名字长度
 	}{}
 
 	sp := utils.GetScope(c)
