@@ -1,4 +1,4 @@
-package me
+package service
 
 import (
 	"github.com/daidr/doulog-core/lib/daos"

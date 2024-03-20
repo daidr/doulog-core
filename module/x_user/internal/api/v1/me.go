@@ -5,7 +5,7 @@ import (
 	"github.com/daidr/doulog-core/lib/format"
 	"github.com/daidr/doulog-core/lib/utils"
 	"github.com/daidr/doulog-core/module/x_user/internal/e"
-	"github.com/daidr/doulog-core/module/x_user/internal/service/me"
+	"github.com/daidr/doulog-core/module/x_user/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,7 +24,7 @@ func ChangeNickName(c *gin.Context) {
 	}
 
 	// 昵称查重并修改
-	ok, err := me.ChangeNickName(sp.DB, uid, req.NewName)
+	ok, err := service.ChangeNickName(sp.DB, uid, req.NewName)
 
 	if ok {
 		format.HTTP(c, ecode.Success, nil)

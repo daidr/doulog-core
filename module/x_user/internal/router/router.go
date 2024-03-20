@@ -10,8 +10,13 @@ import (
 func Init(sp *models.Scope) {
 	apiV1 := sp.HTTP.Group("/v1")
 	{
-		apiV1.GET("/me", middlewares.Auth(false), v1.GetSelfInfo) // 获取自己的信息
+		apiV1.GET("/me", middlewares.Auth(false, false), v1.GetSelfInfo) // 获取自己的信息
 
-		apiV1.POST("/me/change_name", middlewares.Auth(true), v1.ChangeNickName) // 修改昵称
+		apiV1.POST("/me/change_name", middlewares.Auth(true, false), v1.ChangeNickName) // 修改用户名
+
+		apiV1.GET("/user/:uid", middlewares.Auth(true, true), v1.GetUserInfo) // 获取用户信息
+
+		apiV1.GET("/users", middlewares.Auth(true, true), v1.ListAllUsers) // 获取所有用户信息
+
 	}
 }

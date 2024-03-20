@@ -2,17 +2,14 @@ package hub
 
 import (
 	"fmt"
-	"github.com/daidr/doulog-core/lib/search"
-
 	"github.com/daidr/doulog-core/hub/internal/db/pgsql"
 	"github.com/daidr/doulog-core/hub/internal/db/redis"
 	"github.com/daidr/doulog-core/hub/internal/logger"
 	"github.com/daidr/doulog-core/hub/internal/middleware"
 	"github.com/daidr/doulog-core/lib/conf"
 	"github.com/daidr/doulog-core/lib/models"
+	"github.com/daidr/doulog-core/lib/search"
 	"github.com/patrickmn/go-cache"
-
-	//"github.com/daidr/doulog-core/lib/search"
 	"log"
 	"time"
 

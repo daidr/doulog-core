@@ -20,5 +20,6 @@ type BUser struct {
 	Homepage  string `json:"homepage"`   // 个人主页
 	IsAdmin   bool   `json:"is_admin"`   // 是否是管理员
 	IsBanned  bool   `json:"is_banned"`  // 是否被封禁
+	CreatedAt int64  `json:"created_at"` // 创建时间
 	Attr      int    `json:"attr"`       // 属性位
 }
