@@ -16,11 +16,11 @@ func Init(scope *models.Scope) {
 	apiV1 := scope.HTTP.Group("/v1")
 	{
 		// 实际注册完整路由: <host>/api/test/ping/v1/
-		apiV1.GET("/", middlewares.Auth(false, false), v1.Ping)
+		apiV1.GET("/", middlewares.Auth(false, false, false), v1.Ping)
 		// 实际注册完整路由: <host>/api/test/ping/v1/get_req_info
 		apiV1.GET("/get_req_info", v1.GetReqInfo)
 		// 实际注册完整路由: <host>/api/test/ping/v1/error
-		apiV1.GET("/error", middlewares.Auth(false, false), v1.Error)
+		apiV1.GET("/error", middlewares.Auth(false, false, false), v1.Error)
 		apiV1.GET("/panic", v1.Panic)
 
 		// 模块内使用Redis演示，你可以随意修改参数试试效果
@@ -40,7 +40,7 @@ func Init(scope *models.Scope) {
 		// 实际注册完整路由: <host>/api/test/ping/v2/
 		apiV2.GET("/", v2.Ping)
 		// 实际注册完整路由: <host>/api/test/ping/v2/get_req_info
-		apiV2.GET("/get_req_info", middlewares.Auth(false, false), v2.GetReqInfo)
+		apiV2.GET("/get_req_info", middlewares.Auth(false, false, false), v2.GetReqInfo)
 	}
 
 }

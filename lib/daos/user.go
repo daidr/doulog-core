@@ -62,3 +62,25 @@ func (d *User) ChangeUserNameByUID(uid uint64, newName string) error {
 	}
 	return nil
 }
+
+func (d *User) ChangeEmailByUID(uid uint64, newEmail string) error {
+	err := d.db.PgSQL.Model(&models.TUser{}).
+		Where("id = ?", uid).
+		Update("email", newEmail).Error
+
+	if err != nil {
+		return errors.WithMessage(err, "failed to change email")
+	}
+	return nil
+}
+
+func (d *User) ChangeHomepageByUID(uid uint64, newHomepage string) error {
+	err := d.db.PgSQL.Model(&models.TUser{}).
+		Where("id = ?", uid).
+		Update("homepage", newHomepage).Error
+
+	if err != nil {
+		return errors.WithMessage(err, "failed to change homepage")
+	}
+	return nil
+}

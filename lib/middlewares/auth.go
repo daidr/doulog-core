@@ -17,7 +17,7 @@ import (
 // false为游客也可以访问，游客uid=0，若有登录则uid!=0
 //
 // 即在必须登陆操作的接口传入true,在游客、登录者均可访问的接口(某些字段因访问者而不同)传入false，完全不需要登录的接口不使用该中间件
-func Auth(force bool, admin bool) gin.HandlerFunc {
+func Auth(force bool, admin bool, forceAdmin bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		uid, err := getUID(utils.GetScope(c).DB, c.GetHeader("Authorization"))
 		if err != nil && force {
@@ -33,11 +33,12 @@ func Auth(force bool, admin bool) gin.HandlerFunc {
 				format.HTTP(c, ecode.Unauthorized, nil)
 				return
 			}
-			if !isAdmin {
+			if forceAdmin && !isAdmin {
 				c.Abort()
 				format.HTTP(c, ecode.PermissionDenied, nil)
 				return
 			}
+			c.Set("ADMIN", isAdmin)
 		}
 
 		c.Set("UID", uid)
