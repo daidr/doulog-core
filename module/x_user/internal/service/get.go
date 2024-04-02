@@ -15,6 +15,7 @@ func GetUserInfo(db *models.DB, uid uint64) (*model.GetUserInfoResp, error) {
 			Email:     "",
 			EmailHash: "",
 			Homepage:  "",
+			Motto:     "",
 			IsAdmin:   false,
 			IsBanned:  false,
 		}, nil
@@ -31,6 +32,7 @@ func GetUserInfo(db *models.DB, uid uint64) (*model.GetUserInfoResp, error) {
 		Email:     u.Email,
 		EmailHash: u.EmailHash,
 		Homepage:  u.Homepage,
+		Motto:     u.Motto,
 		IsAdmin:   u.IsAdmin,
 		IsBanned:  u.IsBanned,
 		CreatedAt: u.CreatedAt,

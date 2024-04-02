@@ -3,6 +3,9 @@ package hub
 import (
 	"context"
 	"fmt"
+	"github.com/daidr/doulog-core/lib/search"
+	"github.com/daidr/doulog-core/lib/utils"
+	"math/rand"
 	"net/http"
 	"sync"
 	"time"
@@ -62,6 +65,96 @@ func Run() {
 // 根据 Module 生命周期 此过程应在Login前调用
 func StartService() {
 	onceStart.Do(doStartService)
+
+	return
+
+	// 循环10w次，插入测试数据
+	for i := 0; i < 100000; i++ {
+		err := hub.PgSQL.Transaction(func(tx *gorm.DB) error {
+			name := randomUserName()
+			email := randomEmail()
+			u := models.TUser{
+				Name:      name,
+				Email:     email,
+				EmailHash: utils.GetMD5(email),
+				Homepage:  randomHomepage(),
+				IsAdmin:   false,
+				Attr:      0,
+			}
+
+			tx.Create(&u)
+
+			if err := search.IndexUser(search.UserSearch{
+				ID:    u.Id,
+				Name:  u.Name,
+				Email: u.Email,
+			}); err != nil {
+				return err
+			}
+
+			return nil
+		})
+		if err != nil {
+			return
+		}
+	}
+}
+
+func randomString() string {
+	var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, 10)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
+}
+
+func randomUserName() string {
+	prefix1 := "Test User"
+	prefix2 := "测试用户"
+
+	if rand.Intn(2) == 0 {
+		return prefix1 + randomString()
+	} else {
+		return prefix2 + randomString()
+	}
+}
+
+func randomEmail() string {
+	suffix1 := "@example.com"
+	suffix2 := "@world.cn"
+	suffix3 := "@163.com"
+	suffix4 := "@hello.org"
+
+	num := rand.Intn(4)
+	if num == 0 {
+		return randomString() + suffix1
+	} else if num == 1 {
+		return randomString() + suffix2
+
+	} else if num == 2 {
+		return randomString() + suffix3
+	} else {
+		return randomString() + suffix4
+	}
+}
+
+func randomHomepage() string {
+	suffix1 := ".com"
+	suffix2 := ".cn"
+	suffix3 := ".com"
+	suffix4 := ".org"
+
+	num := rand.Intn(4)
+	if num == 0 {
+		return "https://" + randomString() + suffix1
+	} else if num == 1 {
+		return "https://" + randomString() + suffix2
+	} else if num == 2 {
+		return "https://" + randomString() + suffix3
+	} else {
+		return "https://" + randomString() + suffix4
+	}
 }
 
 func doStartService() {

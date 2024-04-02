@@ -8,6 +8,7 @@ type GetUserInfoResp struct {
 	EmailHash string `json:"email_hash"`
 	Email     string `json:"email"`
 	Homepage  string `json:"homepage"`
+	Motto     string `json:"motto"`
 	IsAdmin   bool   `json:"is_admin"`
 	IsBanned  bool   `json:"is_banned"`
 	CreatedAt int64  `json:"created_at"`

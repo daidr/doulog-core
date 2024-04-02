@@ -6,6 +6,7 @@ type TUser struct {
 	Email     string `gorm:"not null;column:email;unique"`             // 邮箱
 	EmailHash string `gorm:"not null;column:email_hash;unique"`        // 邮箱 Hash
 	Homepage  string `gorm:"not null;column:homepage"`                 // 个人主页
+	Motto     string `gorm:"column:motto"`                             // 座右铭
 	IsAdmin   bool   `gorm:"type:boolean;not null;column:is_admin"`    // 是否是管理员
 	IsBanned  bool   `gorm:"type:boolean;column:is_banned"`            // 是否被封禁
 	Attr      int    `gorm:"type:smallint;not null;column:attr"`       // 属性位
@@ -18,6 +19,7 @@ type BUser struct {
 	Email     string `json:"email"`      // 邮箱
 	EmailHash string `json:"email_hash"` // 邮箱 Hash
 	Homepage  string `json:"homepage"`   // 个人主页
+	Motto     string `json:"motto"`      // 座右铭
 	IsAdmin   bool   `json:"is_admin"`   // 是否是管理员
 	IsBanned  bool   `json:"is_banned"`  // 是否被封禁
 	CreatedAt int64  `json:"created_at"` // 创建时间

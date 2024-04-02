@@ -25,7 +25,7 @@ func (d *User) GetB(uid uint64) (*models.BUser, error) {
 	var u models.BUser
 
 	err := d.db.PgSQL.Model(&models.TUser{}).
-		Select("t_users.id, t_users.name, t_users.attr, t_users.email, t_users.email_hash, t_users.is_admin, t_users.homepage, t_users.created_at").
+		Select("t_users.id, t_users.name, t_users.attr, t_users.email, t_users.motto, t_users.email_hash, t_users.is_admin, t_users.homepage, t_users.created_at").
 		Where("t_users.id = ?", uid).First(&u).Error
 	if err != nil {
 		return nil, errors.WithMessage(err, "failed to get user")
@@ -81,6 +81,17 @@ func (d *User) ChangeHomepageByUID(uid uint64, newHomepage string) error {
 
 	if err != nil {
 		return errors.WithMessage(err, "failed to change homepage")
+	}
+	return nil
+}
+
+func (d *User) ChangeMottoByUID(uid uint64, newMotto string) error {
+	err := d.db.PgSQL.Model(&models.TUser{}).
+		Where("id = ?", uid).
+		Update("motto", newMotto).Error
+
+	if err != nil {
+		return errors.WithMessage(err, "failed to change motto")
 	}
 	return nil
 }

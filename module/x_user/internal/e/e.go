@@ -13,6 +13,7 @@ var (
 	ErrUpdateEmail    = ecode.New(104005)
 	ErrEmailExisted   = ecode.New(104006)
 	ErrUpdateHomepage = ecode.New(104007)
+	ErrorUpdateMotto  = ecode.New(104008)
 )
 
 var ECode = map[ecode.Code]string{
@@ -23,4 +24,5 @@ var ECode = map[ecode.Code]string{
 	ErrUpdateEmail:    "Failed to update email",
 	ErrEmailExisted:   "Email existed",
 	ErrUpdateHomepage: "Failed to update homepage",
+	ErrorUpdateMotto:  "Failed to update motto",
 }

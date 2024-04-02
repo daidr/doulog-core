@@ -122,4 +122,22 @@ func UpdateUserInfo(c *gin.Context) {
 		}
 	}
 
+	if uri.TargetField == "motto" {
+		ok, err := service.UpdateMotto(sp.DB, finalTargetUid, req.NewMotto)
+
+		if ok {
+			format.HTTP(c, ecode.Success, nil)
+			return
+		}
+
+		if err != nil {
+			format.HTTP(c, e.ErrorUpdateMotto, nil)
+			sp.Log.Debugw("failed to update user info",
+				"error", err,
+				"uid", uid,
+				"new_motto", req.NewMotto)
+			return
+		}
+	}
+
 }

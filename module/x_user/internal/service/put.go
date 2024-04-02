@@ -72,3 +72,16 @@ func UpdateHomepage(db *models.DB, uid uint64, newHomepage string) (bool, error)
 
 	return true, nil
 }
+
+/*
+UpdateMotto 修改座右铭
+false err -> dao出错
+*/
+func UpdateMotto(db *models.DB, uid uint64, newMotto string) (bool, error) {
+	// 更新主页
+	if err := daos.NewUser(db).ChangeMottoByUID(uid, newMotto); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
