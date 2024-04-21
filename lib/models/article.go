@@ -7,7 +7,7 @@ type TArticle struct {
 	Slug        string `gorm:"not null;unique;column:slug"`              // slug
 	Type        int    `gorm:"type:smallint;not null;column:type"`       // 类型，0为post，1为page
 	Title       string `gorm:"not null;column:title"`                    // 标题
-	Hero        uint64 `gorm:"column:hero"`                              // 封面图 image id
+	Hero        uint64 `gorm:"column:hero"`                              // 封面图 heif id
 	Summary     string `gorm:"not null;column:summary"`                  // 简介
 	Content     string `gorm:"not null;column:content"`                  // 内容
 	Author      uint64 `gorm:"not null;column:author;index"`             // 发布者 uid
@@ -30,7 +30,7 @@ type BArticle struct {
 	ID      uint64  `json:"id"`
 	Slug    string  `json:"slug"`
 	Title   string  `json:"title"`
-	Hero    *BImage `json:"hero,omitempty"`
+	Hero    *BMedia `json:"hero,omitempty"`
 	Content string  `json:"content"`
 	Attr    int     `json:"attr"`
 	Author  *BUser  `json:"author,omitempty"`

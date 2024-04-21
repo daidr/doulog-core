@@ -8,7 +8,7 @@ site = "http://localhost:3000"
 host = "localhost"
 port = 5432
 username = "username"
-password = "password"
+password = "password"W
 database = "doulog"
 
 [redis]
@@ -27,3 +27,10 @@ frontend_callback_prefix = ['http://localhost:5432']
 # GitHub OAuth2 Config
 client_id = ""
 client_secret = ""
+
+[limit.media]
+# in kilobytes
+file_size = 51200
+#in pixels
+image_size = 7680
+mime = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"]

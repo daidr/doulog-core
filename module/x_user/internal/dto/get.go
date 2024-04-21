@@ -1,17 +1,17 @@
-package model
+package dto
 
 import "github.com/daidr/doulog-core/lib/models"
 
 type GetUserInfoResp struct {
 	Id        uint64 `json:"id"`
 	Name      string `json:"name"`
-	EmailHash string `json:"email_hash"`
+	EmailHash string `json:"emailHash"`
 	Email     string `json:"email"`
 	Homepage  string `json:"homepage"`
 	Motto     string `json:"motto"`
-	IsAdmin   bool   `json:"is_admin"`
-	IsBanned  bool   `json:"is_banned"`
-	CreatedAt int64  `json:"created_at"`
+	IsAdmin   bool   `json:"isAdmin"`
+	IsBanned  bool   `json:"isBanned"`
+	CreatedAt int64  `json:"createdAt"`
 }
 
 type UserListReq struct {

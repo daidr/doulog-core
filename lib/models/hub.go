@@ -9,10 +9,11 @@ import (
 )
 
 type Scope struct {
-	HTTP  *gin.RouterGroup
-	Log   *zap.SugaredLogger
-	DB    *DB
-	Cache *cache.Cache
+	HTTP    *gin.RouterGroup
+	Log     *zap.SugaredLogger
+	DB      *DB
+	Cache   *cache.Cache
+	HubHTTP *gin.Engine
 }
 
 type DB struct {

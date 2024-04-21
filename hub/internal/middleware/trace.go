@@ -43,7 +43,8 @@ func Hijack(scope *models.Scope) gin.HandlerFunc {
 				PgSQL: scope.DB.PgSQL,
 				Redis: scope.DB.Redis,
 			},
-			Cache: scope.Cache,
+			Cache:   scope.Cache,
+			HubHTTP: scope.HubHTTP,
 		})
 	}
 }

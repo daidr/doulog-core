@@ -12,7 +12,8 @@ import (
 	_ "github.com/daidr/doulog-core/module/auth_login" // 登录
 
 	/** X */
-	_ "github.com/daidr/doulog-core/module/x_user" // 用户相关
+	_ "github.com/daidr/doulog-core/module/x_media" // 媒体相关
+	_ "github.com/daidr/doulog-core/module/x_user"  // 用户相关
 )
 
 func main() {

@@ -1,4 +1,4 @@
-package v1
+package api
 
 import (
 	"github.com/daidr/doulog-core/lib/auth"
@@ -16,7 +16,7 @@ func Callback(c *gin.Context) {
 	code := c.Query("code")
 
 	token, callback, err := service.Callback(sp.DB, state, code)
-	
+
 	if callback == "" {
 		c.Abort()
 		// callback 不合法，不进行重定向，直接返回错误

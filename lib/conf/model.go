@@ -5,6 +5,7 @@ type config struct {
 	PgSQL  pgsql  `mapstructure:"pgsql"`
 	Redis  redis  `mapstructure:"redis"`
 	Auth   auth   `mapstructure:"auth"`
+	Limit  limit  `mapstructure:"limit"`
 	Debug  bool   `mapstructure:"debug"`
 }
 
@@ -36,4 +37,14 @@ type auth struct {
 type github struct {
 	ClientID     string `mapstructure:"client_id"`
 	ClientSecret string `mapstructure:"client_secret"`
+}
+
+type limit struct {
+	Media mediaLimit `mapstructure:"media"`
+}
+
+type mediaLimit struct {
+	FileSize  uint     `mapstructure:"file_size"`
+	ImageSize uint     `mapstructure:"image_size"`
+	MIME      []string `mapstructure:"mime"`
 }

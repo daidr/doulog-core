@@ -27,7 +27,8 @@ func Auth(force bool, admin bool, forceAdmin bool) gin.HandlerFunc {
 		}
 
 		if admin {
-			isAdmin, err := daos.NewUser(utils.GetScope(c).DB).IsAdmin(uid)
+			isAdmin, attr, err := daos.NewUser(utils.GetScope(c).DB).IsAdmin(uid)
+			c.Set("USER_ATTR", attr)
 			if err != nil {
 				c.Abort()
 				format.HTTP(c, ecode.Unauthorized, nil)

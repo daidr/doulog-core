@@ -11,7 +11,7 @@ import (
 
 func GetRedirectUrl(platform string) (string, string) {
 	mark := utils.RandString(10)
-	redirect := url.QueryEscape(conf.C.Server.Site + "/api/auth/login/v1/callback")
+	redirect := url.QueryEscape(conf.C.Server.Site + "/api/auth/login/callback")
 	state := url.QueryEscape(fmt.Sprintf("%s_%s", platform, mark))
 
 	switch platform {

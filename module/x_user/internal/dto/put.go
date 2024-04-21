@@ -1,4 +1,4 @@
-package model
+package dto
 
 type UpdateUserInfoReq struct {
 	NewName     string `json:"name" form:"name" binding:"omitempty,min=1,max=25,sensitive,xss"`

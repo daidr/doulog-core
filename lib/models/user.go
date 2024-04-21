@@ -1,7 +1,7 @@
 package models
 
 type TUser struct {
-	Id        uint64 `gorm:"primaryKey;autoIncrement;column:id;index"` // ID
+	Id        uint64 `gorm:"primaryKey;autoIncrement;column:id;index"` // Id
 	Name      string `gorm:"not null;column:name;unique"`              // 昵称
 	Email     string `gorm:"not null;column:email;unique"`             // 邮箱
 	EmailHash string `gorm:"not null;column:email_hash;unique"`        // 邮箱 Hash
@@ -13,15 +13,30 @@ type TUser struct {
 	TimeHook
 }
 
+func (t *TUser) B() *BUser {
+	return &BUser{
+		Id:        t.Id,
+		Name:      t.Name,
+		Email:     t.Email,
+		EmailHash: t.EmailHash,
+		Homepage:  t.Homepage,
+		Motto:     t.Motto,
+		IsAdmin:   t.IsAdmin,
+		IsBanned:  t.IsBanned,
+		CreatedAt: t.CreatedAt,
+		Attr:      t.Attr,
+	}
+}
+
 type BUser struct {
-	Id        uint64 `json:"id"`         // ID
-	Name      string `json:"name"`       // 昵称
-	Email     string `json:"email"`      // 邮箱
-	EmailHash string `json:"email_hash"` // 邮箱 Hash
-	Homepage  string `json:"homepage"`   // 个人主页
-	Motto     string `json:"motto"`      // 座右铭
-	IsAdmin   bool   `json:"is_admin"`   // 是否是管理员
-	IsBanned  bool   `json:"is_banned"`  // 是否被封禁
-	CreatedAt int64  `json:"created_at"` // 创建时间
-	Attr      int    `json:"attr"`       // 属性位
+	Id        uint64 `json:"id"`        // Id
+	Name      string `json:"name"`      // 昵称
+	Email     string `json:"email"`     // 邮箱
+	EmailHash string `json:"emailHash"` // 邮箱 Hash
+	Homepage  string `json:"homepage"`  // 个人主页
+	Motto     string `json:"motto"`     // 座右铭
+	IsAdmin   bool   `json:"isAdmin"`   // 是否是管理员
+	IsBanned  bool   `json:"isBanned"`  // 是否被封禁
+	CreatedAt int64  `json:"createdAt"` // 创建时间
+	Attr      int    `json:"attr"`      // 属性位
 }

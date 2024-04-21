@@ -34,15 +34,15 @@ func (d *User) GetB(uid uint64) (*models.BUser, error) {
 	return &u, nil
 }
 
-func (d *User) IsAdmin(uid uint64) (bool, error) {
+func (d *User) IsAdmin(uid uint64) (bool, int, error) {
 	var u models.BUser
 	err := d.db.PgSQL.Model(&models.TUser{}).
-		Select("t_users.is_admin").
+		Select("t_users.is_admin, t_users.attr").
 		Where("t_users.id = ?", uid).First(&u).Error
 	if err != nil {
-		return false, errors.WithMessage(err, "failed to get user")
+		return false, 0, errors.WithMessage(err, "failed to get user")
 	}
-	return u.IsAdmin, nil
+	return u.IsAdmin, u.Attr, nil
 }
 
 func (d *User) Add(user *models.TUser) error {

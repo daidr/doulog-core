@@ -7,6 +7,7 @@ import (
 	"github.com/daidr/doulog-core/hub/internal/logger"
 	"github.com/daidr/doulog-core/hub/internal/middleware"
 	"github.com/daidr/doulog-core/lib/conf"
+	"github.com/daidr/doulog-core/lib/localstorage"
 	"github.com/daidr/doulog-core/lib/models"
 	"github.com/daidr/doulog-core/lib/search"
 	"github.com/patrickmn/go-cache"
@@ -40,6 +41,11 @@ func Init() {
 		hub.Log.Fatalw("failed to init search",
 			"error", err)
 	}
+
+	if err = localstorage.Init(); err != nil {
+		hub.Log.Fatalw("failed to init localstorage",
+			"error", err)
+	}
 }
 
 func initDB() {
@@ -52,7 +58,7 @@ func initDB() {
 	if err = m.AutoMigrate(
 		&models.TArticle{},
 		&models.TArticleTag{},
-		&models.TImage{},
+		&models.TMedia{},
 		&models.TArticleLike{},
 		&models.TOauth{},
 		&models.TReply{},
@@ -113,7 +119,8 @@ func initMods() {
 				PgSQL: hub.PgSQL,
 				Redis: hub.Redis,
 			},
-			Cache: hub.Cache,
+			Cache:   hub.Cache,
+			HubHTTP: hub.HTTP,
 		}
 		g.Use(middleware.Hijack(scope))
 

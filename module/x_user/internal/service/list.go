@@ -2,12 +2,12 @@ package service
 
 import (
 	"github.com/daidr/doulog-core/lib/models"
-	"github.com/daidr/doulog-core/module/x_user/internal/model"
+	"github.com/daidr/doulog-core/module/x_user/internal/dto"
 )
 
-func ListAllUsers(db *models.DB, req *model.UserListReq) (*model.UserListResp, error) {
-	var resp model.UserListResp
-	var users []model.GetUserInfoResp
+func ListAllUsers(db *models.DB, req *dto.UserListReq) (*dto.UserListResp, error) {
+	var resp dto.UserListResp
+	var users []dto.GetUserInfoResp
 	var total int64
 	var err error
 

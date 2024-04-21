@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 func GetScope(c *gin.Context) *models.Scope {
@@ -38,6 +37,10 @@ func GetMPFDContentType(src io.Reader) (string, error) {
 		return "", err
 	}
 
+	if len(buffer) >= 12 && string(buffer[4:12]) == "ftypheic" {
+		return "image/heic", nil
+	}
+
 	return http.DetectContentType(buffer), nil
 }
 
@@ -47,12 +50,23 @@ func IsAllowedFrontendCallback(callback string) bool {
 		// if no prefix is set, allow all
 		return true
 	}
-
+	u, err := url.Parse(callback)
+	if err != nil {
+		return false
+	}
+	scheme := u.Scheme
+	host := u.Hostname()
+	port := u.Port()
 	for _, prefix := range frontendCallbackPrefix {
-		if strings.HasPrefix(callback, prefix) {
+		prefixUrl, err := url.Parse(prefix)
+		if err != nil {
+			continue
+		}
+
+		if host == prefixUrl.Hostname() && port == prefixUrl.Port() && scheme == prefixUrl.Scheme {
 			return true
 		}
 	}
-	
+
 	return false
 }

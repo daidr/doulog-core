@@ -1,19 +1,19 @@
-package v1
+package api
 
 import (
 	"github.com/daidr/doulog-core/lib/ecode"
 	"github.com/daidr/doulog-core/lib/format"
 	"github.com/daidr/doulog-core/lib/utils"
+	"github.com/daidr/doulog-core/module/x_user/internal/dto"
 	"github.com/daidr/doulog-core/module/x_user/internal/e"
-	"github.com/daidr/doulog-core/module/x_user/internal/model"
 	"github.com/daidr/doulog-core/module/x_user/internal/service"
 	"github.com/gin-gonic/gin"
 )
 
 // UpdateUserInfo 更新用户信息
 func UpdateUserInfo(c *gin.Context) {
-	var req model.UpdateUserInfoReq
-	var uri model.UpdateUserInfoUri
+	var req dto.UpdateUserInfoReq
+	var uri dto.UpdateUserInfoUri
 
 	sp := utils.GetScope(c)
 	uid := c.GetUint64("UID")

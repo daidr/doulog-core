@@ -3,13 +3,13 @@ package service
 import (
 	"github.com/daidr/doulog-core/lib/daos"
 	"github.com/daidr/doulog-core/lib/models"
-	"github.com/daidr/doulog-core/module/x_user/internal/model"
+	"github.com/daidr/doulog-core/module/x_user/internal/dto"
 )
 
-func GetUserInfo(db *models.DB, uid uint64) (*model.GetUserInfoResp, error) {
+func GetUserInfo(db *models.DB, uid uint64) (*dto.GetUserInfoResp, error) {
 	// 未登录返回空
 	if uid == 0 {
-		return &model.GetUserInfoResp{
+		return &dto.GetUserInfoResp{
 			Id:        0,
 			Name:      "",
 			Email:     "",
@@ -26,7 +26,7 @@ func GetUserInfo(db *models.DB, uid uint64) (*model.GetUserInfoResp, error) {
 		return nil, err
 	}
 
-	return &model.GetUserInfoResp{
+	return &dto.GetUserInfoResp{
 		Id:        u.Id,
 		Name:      u.Name,
 		Email:     u.Email,
