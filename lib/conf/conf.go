@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	"github.com/spf13/viper"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 var C config
@@ -18,6 +20,18 @@ func Init() error {
 	replacer := strings.NewReplacer(".", "_")
 	c.SetEnvKeyReplacer(replacer)
 	c.AutomaticEnv()
+
+	// ADD START
+	envKeysMap := &map[string]interface{}{}
+	if err := mapstructure.Decode(C, &envKeysMap); err != nil {
+		return err
+	}
+	for k := range *envKeysMap {
+		if bindErr := viper.BindEnv(k); bindErr != nil {
+			return bindErr
+		}
+	}
+	// ADD END
 
 	// If a config file is found, read it in.
 	if err := c.ReadInConfig(); err != nil {
