@@ -12,6 +12,7 @@ func Init() error {
 	c := viper.New()
 	c.SetEnvPrefix("doulog")
 	c.SetConfigName("config")
+	c.SetConfigType("toml")
 	c.AddConfigPath(".")
 	c.AddConfigPath("etc")
 	replacer := strings.NewReplacer(".", "_")

@@ -9,6 +9,9 @@ RUN apk update && apk add --no-cache 'git=~2'
 # Install build tools
 RUN apk add --no-cache gcc g++ make
 
+# Install libstdc++ libgcc
+RUN apk add --no-cache openssl ncurses-libs libstdc++ libgcc
+
 # Install dependencies
 ENV GO111MODULE=on
 WORKDIR $GOPATH/src/packages/doulog-core/
@@ -28,9 +31,14 @@ FROM alpine:3
 
 WORKDIR /
 
+# Copy shared libraries
+RUN apk add --no-cache openssl ncurses-libs libstdc++ libgcc
+
 # Copy our static executable.
 COPY --from=builder /go/main /go/main
 
+# Create /go/config.toml
+RUN echo "debug = true" > /go/config.toml
 
 ENV GIN_MODE release
 ENV DOULOG_SERVER_PORT 8080
