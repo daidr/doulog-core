@@ -44,6 +44,19 @@ func Init() error {
 		println("Callback prefix: ", prefix)
 	}
 
+	// print postgres
+	println("Postgres host: ", C.PgSQL.Host)
+	println("Postgres port: ", C.PgSQL.Port)
+	println("Postgres username: ", C.PgSQL.Username)
+	println("Postgres password: ", C.PgSQL.Password)
+	println("Postgres database: ", C.PgSQL.Database)
+
+	// print redis
+	println("Redis host: ", C.Redis.Host)
+	println("Redis port: ", C.Redis.Port)
+	println("Redis auth: ", C.Redis.Auth)
+	println("Redis database: ", C.Redis.Database)
+
 	return nil
 }
 
