@@ -17,8 +17,7 @@ func Init() error {
 	c.SetConfigType("toml")
 	c.AddConfigPath(".")
 	c.AddConfigPath("etc")
-	replacer := strings.NewReplacer(".", "_")
-	c.SetEnvKeyReplacer(replacer)
+	c.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 	c.AutomaticEnv()
 
 	// ADD START
@@ -39,6 +38,12 @@ func Init() error {
 	if err := c.Unmarshal(&C); err != nil {
 		return err
 	}
+
+	// print all Frontend callback prefix
+	for _, prefix := range C.Auth.FrontendCallbackPrefix {
+		println("Callback prefix: ", prefix)
+	}
+
 	return nil
 }
 
