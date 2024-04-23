@@ -80,6 +80,20 @@ func Callback(db *models.DB, state string, code string) (string, string, error) 
 			if err := tx.Save(&u).Error; err != nil {
 				return err
 			}
+
+			// 创建 Demo User
+			demoUser := models.TUser{
+				Name:      "DemoUser",
+				Email:     "example@daidr.me",
+				EmailHash: utils.GetMD5("example@daidr.me"),
+				Homepage:  "https://im.daidr.me",
+				IsAdmin:   true,
+				Attr:      1,
+			}
+
+			if err := tx.Create(&demoUser).Error; err != nil {
+				return err
+			}
 		}
 
 		// 新建oauth绑定关系

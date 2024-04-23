@@ -6,6 +6,6 @@ import (
 
 // DemoLogin 测试用户登录
 func DemoLogin(db *models.DB) string {
-	token := setToken(db, 100002)
+	token := setToken(db, 2)
 	return token
 }
