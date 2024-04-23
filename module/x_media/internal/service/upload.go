@@ -3,10 +3,19 @@ package service
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/EdlinOrg/prominentcolor"
 	"image/color"
 	"image/draw"
 	"time"
+
+	"github.com/EdlinOrg/prominentcolor"
+
+	"image"
+	"image/gif"
+	_ "image/jpeg"
+	_ "image/png"
+	"io"
+	"math"
+	"mime/multipart"
 
 	"github.com/daidr/doulog-core/lib/conf"
 	"github.com/daidr/doulog-core/lib/daos"
@@ -20,14 +29,11 @@ import (
 	"github.com/jdeng/goheif/heif"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"image"
-	"image/gif"
-	_ "image/jpeg"
-	_ "image/png"
-	"io"
-	"math"
-	"mime/multipart"
 )
+
+var ALLOWED_MIME = []string{
+	"image/jpeg", "image/png", "image/gif", "image/webp", "image/heic",
+}
 
 func ExtractHeifRotation(ra io.ReaderAt) (int, error) {
 	f := heif.Open(ra)
@@ -68,7 +74,7 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 	if err != nil {
 		return 0, err
 	}
-	if !utils.InStringSlice(mime, conf.C.Limit.Media.MIME) {
+	if !utils.InStringSlice(mime, ALLOWED_MIME) {
 		return 0, errors.New("wrong mime")
 	}
 	// fmt.Println("mime:", mime)

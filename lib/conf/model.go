@@ -44,7 +44,6 @@ type limit struct {
 }
 
 type mediaLimit struct {
-	FileSize  uint     `mapstructure:"file_size"`
-	ImageSize uint     `mapstructure:"image_size"`
-	MIME      []string `mapstructure:"mime"`
+	FileSize  uint `mapstructure:"file_size"`
+	ImageSize uint `mapstructure:"image_size"`
 }

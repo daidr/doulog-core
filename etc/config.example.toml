@@ -33,4 +33,3 @@ client_secret = ""
 file_size = 51200
 #in pixels
 image_size = 7680
-mime = ["image/jpeg", "image/png", "image/gif", "image/webp", "image/heic"]
