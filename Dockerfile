@@ -6,6 +6,9 @@ FROM golang:1.21-alpine AS builder
 # Git is required for fetching the dependencies.
 RUN apk update && apk add --no-cache 'git=~2'
 
+# Install build tools
+RUN apk add --no-cache gcc g++ make
+
 # Install dependencies
 ENV GO111MODULE=on
 WORKDIR $GOPATH/src/packages/doulog-core/
