@@ -22,13 +22,11 @@ func Init() error {
 	c.AutomaticEnv()
 
 	// ADD START
-	envKeysMap := &map[string]interface{}{}
-	if err := mapstructure.Decode(C, &envKeysMap); err != nil {
-		return err
-	}
-	for k := range *envKeysMap {
-		if bindErr := viper.BindEnv(k); bindErr != nil {
-			return bindErr
+	keys := getAllKeys(C, "")
+	for _, key := range keys {
+		err := c.BindEnv(key[:len(key)-1])
+		if err != nil {
+			return err
 		}
 	}
 	// ADD END
@@ -42,4 +40,25 @@ func Init() error {
 		return err
 	}
 	return nil
+}
+
+func getAllKeys(C interface{}, parentKeyChain string) []string {
+	var keys []string
+	if parentKeyChain != "" {
+		parentKeyChain += "."
+	}
+	// 如果是数组，直接返回
+	if _, ok := C.([]string); ok {
+		keys = append(keys, parentKeyChain)
+		return keys
+	}
+	tempKeysMap := &map[string]interface{}{}
+	if err := mapstructure.Decode(C, &tempKeysMap); err != nil {
+		keys = append(keys, parentKeyChain)
+	} else {
+		for key := range *tempKeysMap {
+			keys = append(keys, getAllKeys((*tempKeysMap)[key], parentKeyChain+key)...)
+		}
+	}
+	return keys
 }
