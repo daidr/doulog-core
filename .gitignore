@@ -20,3 +20,5 @@ data
 
 /etc/*
 !/etc/config.example.toml
+/dist/config.yaml
+/dist/metadata.json

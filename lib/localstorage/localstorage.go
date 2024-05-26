@@ -21,9 +21,6 @@ func Init() error {
 	if MediaStore, err = initStore("media"); err != nil {
 		return err
 	}
-	if OriginMediaStore, err = initStore("origin_media"); err != nil {
-		return err
-	}
 
 	return nil
 }

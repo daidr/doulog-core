@@ -2,6 +2,7 @@ debug = true
 
 [server]
 port = 3000
+# 服务端地址
 site = "http://localhost:3000"
 
 [pgsql]
@@ -19,7 +20,9 @@ database = 0
 
 [auth]
 # 前端 callback url prefixs
-# front-end callback url prefixs
+# front-end callback url prefixs, 使用场景：
+#   1. OAuth2 回调校验
+#   2. CORS 配置
 frontend_callback_prefix = ['http://localhost:5432']
 
 [auth.github]

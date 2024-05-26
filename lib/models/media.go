@@ -54,7 +54,6 @@ type BMedia struct {
 }
 
 type MediaFileSizes struct {
-	Original   uint64 `json:"original"`
-	Compressed uint64 `json:"compressed"`
-	Thumbnail  uint64 `json:"thumbnail"`
+	Original  uint64 `json:"original"`
+	Thumbnail uint64 `json:"thumbnail"`
 }

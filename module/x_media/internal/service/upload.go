@@ -3,14 +3,11 @@ package service
 import (
 	"bytes"
 	"encoding/json"
-	"image/color"
-	"image/draw"
-	"time"
-
 	"github.com/EdlinOrg/prominentcolor"
 
+	_ "golang.org/x/image/webp"
 	"image"
-	"image/gif"
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"io"
@@ -23,29 +20,13 @@ import (
 	"github.com/daidr/doulog-core/lib/localstorage"
 	"github.com/daidr/doulog-core/lib/models"
 	"github.com/daidr/doulog-core/lib/utils"
-	"github.com/daidr/doulog-core/lib/webp"
 	"github.com/disintegration/imaging"
-	_ "github.com/jdeng/goheif"
-	"github.com/jdeng/goheif/heif"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
 
-var ALLOWED_MIME = []string{
-	"image/jpeg", "image/png", "image/gif", "image/webp", "image/heic",
-}
-
-func ExtractHeifRotation(ra io.ReaderAt) (int, error) {
-	f := heif.Open(ra)
-	primary, err := f.PrimaryItem()
-	if err != nil {
-		return 0, err
-	}
-	if primary == nil {
-		return 0, errors.New("no primary item")
-	}
-	rotations := primary.Rotations()
-	return rotations, nil
+var AllowedMime = []string{
+	"image/jpeg", "image/png", "image/gif", "image/webp",
 }
 
 func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, error) {
@@ -74,7 +55,7 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 	if err != nil {
 		return 0, err
 	}
-	if !utils.InStringSlice(mime, ALLOWED_MIME) {
+	if !utils.InStringSlice(mime, AllowedMime) {
 		return 0, errors.New("wrong mime")
 	}
 	// fmt.Println("mime:", mime)
@@ -87,18 +68,11 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 	}
 
 	var img image.Image
-	var gifImg *gif.GIF
 	img, err = imaging.Decode(bytes.NewReader(buf.Bytes()), imaging.AutoOrientation(true))
 	if err != nil {
 		return 0, err
 	}
 
-	if format == "gif" {
-		gifImg, err = gif.DecodeAll(bytes.NewReader(buf.Bytes()))
-		if err != nil {
-			return 0, err
-		}
-	}
 	width := img.Bounds().Dx()
 	height := img.Bounds().Dy()
 
@@ -134,115 +108,6 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 		title = tag + "." + format
 	}
 
-	webpOptions, err := webp.ConfigPreset(webp.PresetDefault, 75)
-	if err != nil {
-		panic(err)
-	}
-
-	thumbnailWebpOptions, err := webp.ConfigPreset(webp.PresetDefault, 50)
-	if err != nil {
-		panic(err)
-	}
-
-	webpBuf := &bytes.Buffer{}
-
-	if format == "heic" {
-		// heic格式需要旋转
-		ra := bytes.NewReader(buf.Bytes())
-		rotations, err := ExtractHeifRotation(ra)
-		if err != nil {
-			return 0, err
-		}
-
-		if rotations != 0 {
-			if rotations == 1 {
-				img = imaging.Rotate90(img)
-				width, height = height, width
-			} else if rotations == 2 {
-				img = imaging.Rotate180(img)
-			} else if rotations == 3 {
-				img = imaging.Rotate270(img)
-				width, height = height, width
-			}
-
-			err = webp.EncodeRGBA(webpBuf, img, webpOptions)
-			if err != nil {
-				return 0, err
-			}
-		}
-	} else if format == "gif" {
-		// gif格式转换为webp
-		loopCount := 0
-		if gifImg.LoopCount == -1 {
-			loopCount = 1
-		} else if gifImg.LoopCount > 0 {
-			loopCount = gifImg.LoopCount + 1
-		}
-		webpAnimImg, err := webp.NewAnimationEncoder(gifImg.Config.Width, gifImg.Config.Height, 7, 17, loopCount)
-		if err != nil {
-			return 0, err
-		}
-		defer webpAnimImg.Close()
-
-		paintImage := image.NewRGBA(image.Rect(0, 0, width, height))
-		bufferImage := image.NewRGBA(image.Rect(0, 0, width, height))
-		draw.Draw(paintImage, paintImage.Bounds(), gifImg.Image[0], image.Point{}, draw.Src)
-		// 备份当前paintImage
-		draw.Draw(bufferImage, bufferImage.Bounds(), paintImage, image.Point{}, draw.Src)
-		err = webpAnimImg.AddFrame(paintImage, time.Duration(gifImg.Delay[0]*10)*time.Millisecond)
-		if err != nil {
-			return 0, err
-		}
-
-		for i := range gifImg.Image {
-			if i == 0 {
-				continue
-			}
-			// 判断使用 Disposal
-			if gifImg.Disposal[i-1] == gif.DisposalNone {
-				// 备份当前paintImage
-				draw.Draw(bufferImage, bufferImage.Bounds(), paintImage, image.Point{}, draw.Src)
-				// 直接使用当前帧
-				draw.Draw(paintImage, paintImage.Bounds(), gifImg.Image[i], image.Point{}, draw.Over)
-			} else if gifImg.Disposal[i-1] == gif.DisposalBackground {
-				// 使用背景颜色
-				pa, ok := gifImg.Image[i-1].ColorModel().(color.Palette)
-				if !ok {
-					return 0, errors.New("wrong color model")
-				}
-				draw.Draw(paintImage, paintImage.Bounds(), image.NewUniform(pa[gifImg.BackgroundIndex]), image.Point{}, draw.Src)
-				// 绘制当前帧
-				draw.Draw(paintImage, paintImage.Bounds(), gifImg.Image[i], image.Point{}, draw.Over)
-			} else if gifImg.Disposal[i-1] == gif.DisposalPrevious {
-				// 使用上一帧Buffer
-				draw.Draw(paintImage, paintImage.Bounds(), bufferImage, image.Point{}, draw.Src)
-				// 绘制当前帧
-				draw.Draw(paintImage, paintImage.Bounds(), gifImg.Image[i], image.Point{}, draw.Over)
-			} else {
-				// 备份当前paintImage
-				draw.Draw(bufferImage, bufferImage.Bounds(), paintImage, image.Point{}, draw.Src)
-				// 完整覆盖
-				draw.Draw(paintImage, paintImage.Bounds(), gifImg.Image[i], image.Point{}, draw.Over)
-			}
-			err = webpAnimImg.AddFrame(paintImage, time.Duration(gifImg.Delay[i]*10)*time.Millisecond)
-
-			if err != nil {
-				return 0, err
-			}
-		}
-
-		err = webpAnimImg.Assemble(webpBuf)
-		if err != nil {
-			return 0, err
-		}
-	} else {
-		// 直接转换webp
-		err = webp.EncodeRGBA(webpBuf, img, webpOptions)
-		if err != nil {
-			return 0, err
-		}
-	}
-
 	// 转换缩略图
 	thumbnailBuf := &bytes.Buffer{}
 	if width > 256 || height > 256 {
@@ -252,26 +117,22 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 		} else {
 			thumbnailImg = imaging.Resize(img, 0, 256, imaging.Lanczos)
 		}
-		err = webp.Encode(thumbnailBuf, thumbnailImg, thumbnailWebpOptions)
-		if err != nil {
+		// 质量50%
+		if err = imaging.Encode(thumbnailBuf, thumbnailImg, imaging.JPEG, imaging.JPEGQuality(50)); err != nil {
 			return 0, err
 		}
 	} else {
-		err = webp.Encode(thumbnailBuf, img, thumbnailWebpOptions)
-		if err != nil {
+		// 质量50%
+		if err = imaging.Encode(thumbnailBuf, img, imaging.JPEG, imaging.JPEGQuality(50)); err != nil {
 			return 0, err
 		}
 	}
 
-	if err = localstorage.OriginMediaStore.SaveMedia(tag, format, buf.Bytes()); err != nil {
+	if err = localstorage.MediaStore.SaveMedia(tag, format, buf.Bytes()); err != nil {
 		return 0, err
 	}
 
-	if err = localstorage.MediaStore.SaveMedia(tag, "webp", webpBuf.Bytes()); err != nil {
-		return 0, err
-	}
-
-	if err = localstorage.MediaStore.SaveThumbnail(tag, "webp", thumbnailBuf.Bytes()); err != nil {
+	if err = localstorage.MediaStore.SaveThumbnail(tag, "jpg", thumbnailBuf.Bytes()); err != nil {
 		return 0, err
 	}
 
@@ -287,9 +148,8 @@ func Upload(sp *models.Scope, uid uint64, file *multipart.FileHeader) (uint64, e
 	}
 
 	fileSizes, err := json.Marshal(&models.MediaFileSizes{
-		Original:   uint64(buf.Len()),
-		Compressed: uint64(webpBuf.Len()),
-		Thumbnail:  uint64(thumbnailBuf.Len()),
+		Original:  uint64(buf.Len()),
+		Thumbnail: uint64(thumbnailBuf.Len()),
 	})
 
 	if err != nil {

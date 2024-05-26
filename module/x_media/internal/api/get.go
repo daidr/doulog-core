@@ -73,8 +73,8 @@ func GetMediaById(c *gin.Context) {
 
 	// TODO: CDN support
 	if thumbnail != "" {
-		c.Redirect(http.StatusFound, path+hexEtag+"_thumbnail.webp")
+		c.Redirect(http.StatusFound, path+hexEtag+"_thumbnail.jpg")
 	} else {
-		c.Redirect(http.StatusFound, path+hexEtag+".webp")
+		c.Redirect(http.StatusFound, path+hexEtag+"."+resp.Ext)
 	}
 }

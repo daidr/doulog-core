@@ -94,6 +94,14 @@ func Callback(db *models.DB, state string, code string) (string, string, error) 
 			if err := tx.Create(&demoUser).Error; err != nil {
 				return err
 			}
+
+			if err := search.IndexUser(search.UserSearch{
+				ID:    demoUser.Id,
+				Name:  demoUser.Name,
+				Email: demoUser.Email,
+			}); err != nil {
+				return err
+			}
 		}
 
 		// 新建oauth绑定关系

@@ -87,6 +87,7 @@ func initMods() {
 	gin.SetMode(gin.ReleaseMode)
 	engine := gin.New()
 	engine.Use(middleware.Recovery(), middleware.RequestLog())
+	engine.Use(middleware.Cors(conf.C.Auth.FrontendCallbackPrefix))
 	// enable sentry in prod
 	if !conf.C.Debug {
 		engine.Use(middleware.Sentry())
