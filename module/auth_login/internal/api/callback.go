@@ -4,7 +4,7 @@ import (
 	"github.com/daidr/doulog-core/lib/auth"
 	"github.com/daidr/doulog-core/lib/format"
 	"github.com/daidr/doulog-core/lib/utils"
-	"github.com/daidr/doulog-core/module/auth_login/e"
+	"github.com/daidr/doulog-core/module/auth_login/internal/e"
 	"github.com/daidr/doulog-core/module/auth_login/internal/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -24,6 +24,11 @@ func Callback(c *gin.Context) {
 	}
 
 	if err != nil {
+		if err.Error() == "mark not exists" {
+			c.Abort()
+			c.Redirect(http.StatusFound, auth.ReLoginWithMsg(callback, "mark not exists"))
+			return
+		}
 		sp.Log.Debugw("failed to verify callback",
 			"error", err,
 			"state", state,

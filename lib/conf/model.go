@@ -31,6 +31,7 @@ type redis struct {
 
 type auth struct {
 	FrontendCallbackPrefix []string `mapstructure:"frontend_callback_prefix"`
+	BcryptRounds           int      `mapstructure:"bcrypt_rounds"`
 	GitHub                 github   `mapstructure:"github"`
 }
 

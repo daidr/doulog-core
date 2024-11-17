@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/daidr/doulog-core/lib/format"
-	"github.com/daidr/doulog-core/module/auth_login/e"
+	"github.com/daidr/doulog-core/module/auth_login/internal/e"
 	"net/http"
 
 	"github.com/daidr/doulog-core/lib/auth"

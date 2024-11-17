@@ -85,7 +85,7 @@ func StartService() {
 			tx.Create(&u)
 
 			if err := search.IndexUser(search.UserSearch{
-				ID:    u.Id,
+				ID:    u.ID,
 				Name:  u.Name,
 				Email: u.Email,
 			}); err != nil {

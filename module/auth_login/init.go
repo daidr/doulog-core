@@ -3,10 +3,11 @@ package auth_login
 import (
 	"github.com/daidr/doulog-core/hub"
 	"github.com/daidr/doulog-core/lib/conf"
+	"github.com/daidr/doulog-core/lib/daos"
 	"github.com/daidr/doulog-core/lib/ecode"
 	"github.com/daidr/doulog-core/lib/mod"
 	"github.com/daidr/doulog-core/lib/models"
-	"github.com/daidr/doulog-core/module/auth_login/e"
+	"github.com/daidr/doulog-core/module/auth_login/internal/e"
 	"github.com/daidr/doulog-core/module/auth_login/internal/router"
 	"sync"
 )
@@ -22,7 +23,7 @@ type login struct{}
 
 func (m *login) GetModuleInfo() mod.Info {
 	return mod.Info{
-		ID:       mod.NewModuleID(conf.RouterNSAuth, "login"),
+		ID:       mod.NewModuleID(conf.RouterNSMain, "auth"),
 		Instance: ins,
 	}
 }
@@ -47,6 +48,21 @@ func (m *login) PostInit(scope *models.Scope) {
 	// 第二次初始化
 	// 再次过程中可以进行跨Module的动作
 	// 如通用数据库等等
+
+	userDao := daos.NewUser(scope.DB)
+
+	isInitialized, err := userDao.CheckIsInitialized()
+
+	if err != nil {
+		scope.Log.Fatalw("failed to check is initialized", "error", err)
+	}
+
+	if !isInitialized {
+		err := userDao.CreateUser("admin", "admin@example.com", "admin", true)
+		if err != nil {
+			scope.Log.Fatalw("failed to create admin", "error", err)
+		}
+	}
 }
 
 func (m *login) Serve(scope *models.Scope) {

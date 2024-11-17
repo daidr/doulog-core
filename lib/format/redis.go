@@ -48,6 +48,10 @@ func (key) AuthCallback(mark string) string {
 	return Key.Gen("au", "c", mark)
 }
 
+func (key) WebauthnSession(sessionId string) string {
+	return Key.Gen("wa", "s", sessionId)
+}
+
 func (key) LikeHistory(tp int, uid uint64) string {
 	return Key.Gen("ul", strconv.Itoa(tp), strconv.FormatUint(uid, 10))
 }

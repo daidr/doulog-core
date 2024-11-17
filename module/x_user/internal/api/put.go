@@ -71,7 +71,7 @@ func UpdateUserInfo(c *gin.Context) {
 			return
 		}
 
-		format.HTTP(c, e.ErrNameExisted, nil)
+		format.HTTP(c, e.ErrNameExists, nil)
 	}
 
 	if uri.TargetField == "email" {
@@ -96,7 +96,7 @@ func UpdateUserInfo(c *gin.Context) {
 			return
 		}
 
-		format.HTTP(c, e.ErrEmailExisted, nil)
+		format.HTTP(c, e.ErrEmailExists, nil)
 	}
 
 	if uri.TargetField == "homepage" {

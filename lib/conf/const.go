@@ -6,7 +6,6 @@ type RouterNS string
 
 const (
 	RouterNSMain RouterNS = "x"
-	RouterNSAuth RouterNS = "auth"
 	RouterNSTest RouterNS = "test"
 )
 

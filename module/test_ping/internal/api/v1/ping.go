@@ -105,10 +105,10 @@ func HttpRequest(c *gin.Context) {
 
 	// 以一言请求为例
 	text := ""
-	err := request.HTTP().GET("https://v1.hitokoto.cn/?encode=text").BindBody(&text).Do()
+	err := request.HTTP().GET("https://api.daidr.me/apis/hitokoto").BindBody(&text).Do()
 	if err != nil {
 		format.HTTP(c, e.ErrHttpRequest, nil)
-		sp.Log.Debugw("failed to request v1.hitokoto.cn", "error", err)
+		sp.Log.Debugw("failed to request https://api.daidr.me", "error", err)
 		return
 	}
 

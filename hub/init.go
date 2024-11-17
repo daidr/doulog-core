@@ -10,6 +10,7 @@ import (
 	"github.com/daidr/doulog-core/lib/localstorage"
 	"github.com/daidr/doulog-core/lib/models"
 	"github.com/daidr/doulog-core/lib/search"
+	"github.com/daidr/doulog-core/lib/webauthn"
 	"github.com/patrickmn/go-cache"
 	"log"
 	"time"
@@ -35,6 +36,11 @@ func Init() {
 	hub.Log.Info("init config successfully...")
 
 	initDB()
+	if err = webauthn.Init(); err != nil {
+		hub.Log.Fatalw("failed to init webauthn",
+			"error", err)
+	}
+	hub.Log.Info("init webauthn instance successfully...")
 	initMods()
 
 	if err = search.Init(); err != nil {
@@ -65,6 +71,7 @@ func initDB() {
 		&models.TTag{},
 		&models.TUser{},
 		&models.TArticleViews{},
+		&models.TWebAuthnCredential{},
 	); err != nil {
 		hub.Log.Fatalw("failed to auto migrate table",
 			"error", err)
@@ -104,7 +111,6 @@ func initMods() {
 	ns := make(map[string]*gin.RouterGroup)
 	ns[conf.RouterNSMain.NS()] = api.Group(conf.RouterNSMain.NS())
 	ns[conf.RouterNSTest.NS()] = api.Group(conf.RouterNSTest.NS())
-	ns[conf.RouterNSAuth.NS()] = api.Group(conf.RouterNSAuth.NS())
 
 	// 注册模块路由命名空间 /:namespace/:module
 	for _, info := range modules {

@@ -12,6 +12,13 @@ var C config
 
 func Init() error {
 	c := viper.New()
+
+	// SET DEFAULT VALUES
+	c.SetDefault("auth.bcrypt_rounds", 10)
+	c.SetDefault("server.port", 3000)
+	c.SetDefault("limit.media.file_size", 51200)
+	c.SetDefault("limit.media.image_size", 7680)
+
 	c.SetEnvPrefix("doulog")
 	c.SetConfigName("config")
 	c.SetConfigType("toml")
@@ -38,6 +45,9 @@ func Init() error {
 	if err := c.Unmarshal(&C); err != nil {
 		return err
 	}
+
+	// print bcrypt rounds
+	println("Bcrypt rounds: ", C.Auth.BcryptRounds)
 
 	// print all Frontend callback prefix
 	for _, prefix := range C.Auth.FrontendCallbackPrefix {

@@ -35,7 +35,7 @@ func New(e int) Code {
 
 func conv(e int) Code {
 	if _, ok := codes[e]; ok {
-		panic(fmt.Sprintf("ecode: %d has already existed", e))
+		panic(fmt.Sprintf("ecode: %d has already exists", e))
 	}
 	codes[e] = struct{}{}
 	return code(e)

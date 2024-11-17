@@ -3,13 +3,11 @@ package service
 import (
 	"context"
 	"github.com/daidr/doulog-core/lib/auth"
-	"github.com/daidr/doulog-core/lib/conf"
 	"github.com/daidr/doulog-core/lib/format"
 	"github.com/daidr/doulog-core/lib/models"
-	"github.com/daidr/doulog-core/lib/search"
 	"github.com/daidr/doulog-core/lib/utils"
+	authUtils "github.com/daidr/doulog-core/module/auth_login/internal/utils"
 	"github.com/pkg/errors"
-	"gorm.io/gorm"
 	"strings"
 )
 
@@ -51,97 +49,62 @@ func Callback(db *models.DB, state string, code string) (string, string, error) 
 	err = db.PgSQL.Where("platform = ? AND open_id = ?", states[0], open.Id).
 		First(&o).Error
 	if err == nil {
-		token := setToken(db, o.User)
+		token := authUtils.SetToken(db, o.User)
 		return token, callback, nil
 	}
 
-	// 没绑定过则新建用户
-	token := ""
-	err = db.PgSQL.Transaction(func(tx *gorm.DB) error {
-		name := open.Name
-		if name == "" {
-			name = open.Login
-		}
-		u := models.TUser{
-			Name:      name,
-			Email:     open.Email,
-			EmailHash: utils.GetMD5(open.Email),
-			Homepage:  open.Homepage,
-			IsAdmin:   false,
-			Attr:      0,
-		}
-		if err := tx.Create(&u).Error; err != nil {
-			return err
-		}
-
-		// 如果 id 为 1 则设置为管理员
-		if u.Id == 1 {
-			u.IsAdmin = true
-			if err := tx.Save(&u).Error; err != nil {
-				return err
-			}
-
-			// 创建 Demo User
-			demoUser := models.TUser{
-				Name:      "DemoUser",
-				Email:     "example@daidr.me",
-				EmailHash: utils.GetMD5("example@daidr.me"),
-				Homepage:  "https://im.daidr.me",
-				IsAdmin:   true,
-				Attr:      1,
-			}
-
-			if err := tx.Create(&demoUser).Error; err != nil {
-				return err
-			}
-
-			if err := search.IndexUser(search.UserSearch{
-				ID:    demoUser.Id,
-				Name:  demoUser.Name,
-				Email: demoUser.Email,
-			}); err != nil {
-				return err
-			}
-		}
-
-		// 新建oauth绑定关系
-		o = models.TOauth{
-			User:     u.Id,
-			Platform: states[0],
-			OpenID:   open.Id,
-		}
-
-		if err := tx.Create(&o).Error; err != nil {
-			return err
-		}
-
-		if err := search.IndexUser(search.UserSearch{
-			ID:    u.Id,
-			Name:  u.Name,
-			Email: u.Email,
-		}); err != nil {
-			return err
-		}
-
-		token = setToken(db, u.Id)
-		return nil
-	})
-	if err != nil {
-		return "", callback, err
-	}
-	return token, callback, nil
-}
-
-func setToken(db *models.DB, uid uint64) string {
-	for {
-		token := utils.RandString(40)
-
-		ok, err := db.Redis.
-			SetNX(context.Background(),
-				format.Key.AuthToken(token), uid, conf.TokenExpire).
-			Result()
-		if ok && err == nil {
-			return token
-		}
-	}
+	//// 没绑定过则新建用户
+	//token := ""
+	//err = db.PgSQL.Transaction(func(tx *gorm.DB) error {
+	//	name := open.Name
+	//	if name == "" {
+	//		name = open.Login
+	//	}
+	//	u := models.TUser{
+	//		Name:      name,
+	//		Email:     open.Email,
+	//		EmailHash: utils.GetMD5(open.Email),
+	//		Homepage:  open.Homepage,
+	//		IsAdmin:   false,
+	//		Attr:      0,
+	//	}
+	//	if err := tx.Create(&u).Error; err != nil {
+	//		return err
+	//	}
+	//
+	//	// 如果 id 为 1 则设置为管理员
+	//	if u.ID == 1 {
+	//		u.IsAdmin = true
+	//		if err := tx.Save(&u).Error; err != nil {
+	//			return err
+	//		}
+	//	}
+	//
+	//	// 新建oauth绑定关系
+	//	o = models.TOauth{
+	//		User:     u.ID,
+	//		Platform: states[0],
+	//		OpenID:   open.ID,
+	//	}
+	//
+	//	if err := tx.Create(&o).Error; err != nil {
+	//		return err
+	//	}
+	//
+	//	if err := search.IndexUser(search.UserSearch{
+	//		ID:    u.ID,
+	//		Name:  u.Name,
+	//		Email: u.Email,
+	//	}); err != nil {
+	//		return err
+	//	}
+	//
+	//	token = setToken(db, u.ID)
+	//	return nil
+	//})
+	//if err != nil {
+	//	return "", callback, err
+	//}
+	// 没绑定过则返回OAuth未绑定错误
+	return "", callback, errors.New("The OAuth account has not been bound to a specific user yet.")
 }
