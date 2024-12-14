@@ -78,3 +78,109 @@ func ListWebAuthnCredentials(c *gin.Context) {
 
 	format.HTTP(c, ecode.Success, credentials)
 }
+
+func RemoveWebAuthnCredential(c *gin.Context) {
+	sp := utils.GetScope(c)
+	uid := c.GetUint64("UID")
+
+	var req dto.WebAuthnCredentialDeleteReq
+
+	if err := c.ShouldBind(&req); err != nil {
+		sp.Log.Debugw("failed to bind request",
+			"error", err)
+		format.HTTP(c, ecode.InvalidParams, nil)
+		return
+	}
+
+	cid := req.ID
+
+	err := service.DeleteWebAuthnCredential(sp, uid, cid)
+
+	if err != nil {
+		sp.Log.Debugw("failed to delete webauthn credential",
+			"error", err,
+			"uid", uid,
+			"cid", cid)
+		switch err.Error() {
+		case "credential not found":
+			format.HTTP(c, e.ErrCredentialNotExists, nil)
+		default:
+			format.HTTP(c, ecode.UnknownError, nil)
+		}
+		return
+	}
+
+	format.HTTP(c, ecode.Success, nil)
+}
+
+func RenameWebAuthnCredential(c *gin.Context) {
+	sp := utils.GetScope(c)
+	uid := c.GetUint64("UID")
+
+	var req dto.WebAuthnCredentialRenameReq
+
+	if err := c.ShouldBind(&req); err != nil {
+		sp.Log.Debugw("failed to bind request",
+			"error", err)
+		format.HTTP(c, ecode.InvalidParams, nil)
+		return
+	}
+
+	cid := req.ID
+	newLabel := req.Label
+
+	err := service.RenameWebAuthnCredential(sp, uid, cid, newLabel)
+
+	if err != nil {
+		sp.Log.Debugw("failed to rename webauthn credential",
+			"error", err,
+			"uid", uid,
+			"cid", cid)
+		switch err.Error() {
+		case "credential not found":
+			format.HTTP(c, e.ErrCredentialNotExists, nil)
+		default:
+			format.HTTP(c, ecode.UnknownError, nil)
+		}
+		return
+	}
+
+	format.HTTP(c, ecode.Success, nil)
+}
+
+func WDiscoverLoginOptions(c *gin.Context) {
+	sp := utils.GetScope(c)
+	options, err := service.BeginWebAuthnDiscoverLoginOptions(sp)
+
+	if err != nil {
+		sp.Log.Debugw("failed to begin webauthn discover login",
+			"error", err)
+		format.HTTP(c, e.ErrCreateWebAuthnChallenge, nil)
+		return
+	}
+
+	format.HTTP(c, ecode.Success, options)
+}
+
+func WDiscoverLoginFinish(c *gin.Context) {
+	sp := utils.GetScope(c)
+
+	var req dto.WebAuthnLoginFinishReq
+	if err := c.ShouldBind(&req); err != nil {
+		sp.Log.Debugw("failed to bind request",
+			"error", err)
+		format.HTTP(c, ecode.InvalidParams, nil)
+		return
+	}
+
+	token, err := service.FinishWebAuthnDiscoverLogin(sp, req)
+
+	if err != nil {
+		sp.Log.Debugw("failed to finish webauthn discover login",
+			"error", err)
+		format.HTTP(c, e.ErrFinishWebAuthnVerify, nil)
+		return
+	}
+
+	format.HTTP(c, ecode.Success, token)
+}

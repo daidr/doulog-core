@@ -12,6 +12,7 @@ var (
 	ErrPasswordWrong           = ecode.New(101004)
 	ErrCreateWebAuthnChallenge = ecode.New(101005)
 	ErrFinishWebAuthnVerify    = ecode.New(101006)
+	ErrCredentialNotExists     = ecode.New(101007)
 )
 
 var ECode = map[ecode.Code]string{
@@ -21,4 +22,5 @@ var ECode = map[ecode.Code]string{
 	ErrPasswordWrong:           "Password error",
 	ErrCreateWebAuthnChallenge: "Failed to create webauthn challenge",
 	ErrFinishWebAuthnVerify:    "Failed to finish webauthn verify",
+	ErrCredentialNotExists:     "Credential not exists",
 }

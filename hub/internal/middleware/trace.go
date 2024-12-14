@@ -16,7 +16,7 @@ func RequestLog() gin.HandlerFunc {
 		// 用于下面Trace的获取
 		c.Set("trace", trace)
 		start := time.Now()
-		log.Infof("new request...trace id: %s", trace)
+		//log.Infof("new request...trace id: %s", trace)
 
 		c.Next()
 

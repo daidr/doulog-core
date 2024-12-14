@@ -1,6 +1,8 @@
 package daos
 
 import (
+	"encoding/base64"
+	"fmt"
 	"github.com/daidr/doulog-core/lib/conf"
 	"github.com/daidr/doulog-core/lib/haikunator_zh"
 	"github.com/daidr/doulog-core/lib/models"
@@ -10,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 	"time"
 )
 
@@ -68,12 +71,65 @@ func (d *User) Get(uid uint64) (*models.TUser, error) {
 	return &upper, nil
 }
 
-func (d *User) GetWithCredentials(uid uint64) (*models.TUser, error) {
+func (d *User) GetCredentials(uid uint64) (*models.TUser, error) {
 	upper := models.TUser{}
-	if err := d.db.PgSQL.Model(models.TUser{}).Preload("Credentials").First(&upper, uid).Error; err != nil {
+	if err := d.db.PgSQL.Model(models.TUser{}).Preload("Credentials", func(db *gorm.DB) *gorm.DB {
+		return db.Order("t_web_authn_credentials.created_at DESC")
+	}).First(&upper, uid).Error; err != nil {
 		return nil, err
 	}
 	return &upper, nil
+}
+
+func (d *User) UpdateCredentialLastUsedAt(uid uint64, credential *webauthn.Credential) error {
+	realId := base64.RawURLEncoding.EncodeToString(credential.ID)
+	err := d.db.PgSQL.Model(models.TWebAuthnCredential{}).Where("user_id = ? AND credential->>'id' = ?", uid, realId).Updates(map[string]interface{}{
+		"last_used_at": time.Now().Unix(),
+		"credential":   datatypes.NewJSONType(*credential),
+	}).Error
+	if err != nil {
+		return errors.WithMessage(err, "failed to update credential")
+	}
+	return nil
+}
+
+func (d *User) GetUserByCredential(rawId []byte, userHandle []byte) (*models.TUser, error) {
+	credential := models.TWebAuthnCredential{}
+	realId := base64.StdEncoding.EncodeToString(rawId)
+	rawUserHandle := models.WebAuthnIDToUint64(userHandle)
+	if err := d.db.PgSQL.Model(models.TWebAuthnCredential{}).Preload("User.Credentials").Where("credential->>'id' = ? AND user_id = ?", realId, rawUserHandle).First(&credential).Error; err != nil {
+		fmt.Println("error", err)
+		return nil, err
+	}
+	return &credential.User, nil
+}
+
+func (d *User) DeleteCredential(uid, cid uint64) error {
+	var credentials []models.TWebAuthnCredential
+	err := d.db.PgSQL.Clauses(clause.Returning{}).Where("user_id = ? AND id = ?", uid, cid).Delete(&credentials).Error
+
+	if err != nil {
+		return errors.WithMessage(err, "failed to delete credential")
+	}
+
+	if len(credentials) == 0 {
+		return errors.New("credential not found")
+	}
+
+	return nil
+}
+
+func (d *User) RenameCredential(uid, cid uint64, newName string) error {
+	var credentials []models.TWebAuthnCredential
+	err := d.db.PgSQL.Model(&credentials).Clauses(clause.Returning{}).Where("user_id = ? AND id = ?", uid, cid).Update("label", newName).Error
+
+	if err != nil {
+		return errors.WithMessage(err, "failed to rename credential")
+	}
+	if len(credentials) == 0 {
+		return errors.New("credential not found")
+	}
+	return nil
 }
 
 func (d *User) GetByEmail(email string) (*models.TUser, error) {

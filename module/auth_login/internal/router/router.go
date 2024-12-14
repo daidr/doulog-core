@@ -17,6 +17,10 @@ func Init(sp *models.Scope) {
 		apiPath.POST("/webauthn/reg/options", middlewares.Auth(true, false, false), api.WRegOptions)
 		apiPath.POST("/webauthn/reg/finish", middlewares.Auth(true, false, false), api.WRegFinish)
 		apiPath.POST("/webauthn/credentials", middlewares.Auth(true, false, false), api.ListWebAuthnCredentials)
+		apiPath.POST("/webauthn/credentials/remove", middlewares.Auth(true, false, false), api.RemoveWebAuthnCredential)
+		apiPath.POST("/webauthn/credentials/rename", middlewares.Auth(true, false, false), api.RenameWebAuthnCredential)
+		apiPath.POST("/webauthn/login/discover", api.WDiscoverLoginOptions)
+		apiPath.POST("/webauthn/login/assertion", api.WDiscoverLoginFinish)
 
 	}
 }

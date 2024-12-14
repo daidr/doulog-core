@@ -14,3 +14,17 @@ type WebAuthnCredentialResp struct {
 	LastUsedAt int64  `json:"lastUsedAt"`
 	Synced     bool   `json:"synced"`
 }
+
+type WebAuthnCredentialRenameReq struct {
+	ID    uint64 `json:"id"`
+	Label string `json:"label"`
+}
+
+type WebAuthnCredentialDeleteReq struct {
+	ID uint64 `json:"id"`
+}
+
+type WebAuthnLoginFinishReq struct {
+	Challenge     string                               `json:"challenge"`
+	AssertionData protocol.CredentialAssertionResponse `json:"data"`
+}
