@@ -82,7 +82,8 @@ func (d *User) GetCredentials(uid uint64) (*models.TUser, error) {
 }
 
 func (d *User) UpdateCredentialLastUsedAt(uid uint64, credential *webauthn.Credential) error {
-	realId := base64.RawURLEncoding.EncodeToString(credential.ID)
+	realId := base64.StdEncoding.EncodeToString(credential.ID)
+	fmt.Println("realId", realId)
 	err := d.db.PgSQL.Model(models.TWebAuthnCredential{}).Where("user_id = ? AND credential->>'id' = ?", uid, realId).Updates(map[string]interface{}{
 		"last_used_at": time.Now().Unix(),
 		"credential":   datatypes.NewJSONType(*credential),

@@ -159,7 +159,7 @@ func FinishWebAuthnDiscoverLogin(sp *models.Scope, req dto.WebAuthnLoginFinishRe
 
 	uid := models.WebAuthnIDToUint64(parsedData.Response.UserHandle)
 
-	err = daos.NewUser(sp.DB).UpdateCredentialLastUsedAt(models.WebAuthnIDToUint64(parsedData.Response.UserHandle), credential)
+	err = daos.NewUser(sp.DB).UpdateCredentialLastUsedAt(uid, credential)
 
 	token := authUtils.SetToken(sp.DB, uid)
 	return token, err
